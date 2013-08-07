@@ -3,24 +3,24 @@
 		<!-- Sonatype Nexus artifact deployment -->
 		<server>
 			<id>sonatype-nexus-snapshots</id>
-			<username>${env.SONATYPE_USERNAME}</username>
-			<password>${env.SONATYPE_PASSWORD}</password>
+			<username>${env.NEXUS_USERNAME}</username>
+			<password>${env.NEXUS_PASSWORD}</password>
 		</server>
 		<server>
 			<id>sonatype-nexus-staging</id>
-			<username>${env.SONATYPE_USERNAME}</username>
-			<password>${env.SONATYPE_PASSWORD}</password>
+			<username>${env.NEXUS_USERNAME}</username>
+			<password>${env.NEXUS_PASSWORD}</password>
 		</server>
 		<!-- Spout Nexus artifact deployment -->
 		<server>
 			<id>spout-nexus-snapshots</id>
-			<username>${env.SPOUT_NEXUS_USERNAME}</username>
-			<password>${env.SPOUT_NEXUS_PASSWORD}</password>
+			<username>${env.NEXUS_USERNAME}</username>
+			<password>${env.NEXUS_PASSWORD}</password>
 		</server>
 		<server>
 			<id>spout-nexus-releases</id>
-			<username>${env.SPOUT_NEXUS_USERNAME}</username>
-			<password>${env.SPOUT_NEXUS_PASSWORD}</password>
+			<username>${env.NEXUS_USERNAME}</username>
+			<password>${env.NEXUS_PASSWORD}</password>
 		</server>
 		<!-- GitHub site deployment -->
 		<server>
