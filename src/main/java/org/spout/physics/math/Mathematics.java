@@ -26,6 +26,7 @@
  */
 package org.spout.physics.math;
 
+import org.spout.math.imaginary.Quaternion;
 import org.spout.math.vector.Vector3;
 import org.spout.physics.ReactDefaults;
 
@@ -98,4 +99,125 @@ public class Mathematics {
 			return new Vector3(v.getY() * -1, v.getX(), 0).div((float) Math.sqrt(v.getX() * v.getX() + v.getY() * v.getY()));
 		}
 	}
+
+	/**
+	 * Constructs a quaternion from the rotation element of the matrix.
+	 *
+	 * @param matrix The matrix to get the rotation element from
+	 */
+	public static Quaternion QuaternionFromMatrix(Matrix3x3 matrix) {
+		final float trace = matrix.getTrace();
+		float x;
+		float y;
+		float z;
+		float w;
+		if (trace < 0) {
+			if (matrix.get(1, 1) > matrix.get(0, 0)) {
+				if (matrix.get(2, 2) > matrix.get(1, 1)) {
+					final float r = (float) Math.sqrt(matrix.get(2, 2) - matrix.get(0, 0) - matrix.get(1, 1) + 1);
+					final float s = 0.5f / r;
+					x = (matrix.get(2, 0) + matrix.get(0, 2)) * s;
+					y = (matrix.get(1, 2) + matrix.get(2, 1)) * s;
+					z = 0.5f * r;
+					w = (matrix.get(1, 0) - matrix.get(0, 1)) * s;
+				} else {
+					final float r = (float) Math.sqrt(matrix.get(1, 1) - matrix.get(2, 2) - matrix.get(0, 0) + 1);
+					final float s = 0.5f / r;
+					x = (matrix.get(0, 1) + matrix.get(1, 0)) * s;
+					y = 0.5f * r;
+					z = (matrix.get(1, 2) + matrix.get(2, 1)) * s;
+					w = (matrix.get(0, 2) - matrix.get(2, 0)) * s;
+				}
+			} else if (matrix.get(2, 2) > matrix.get(0, 0)) {
+				final float r = (float) Math.sqrt(matrix.get(2, 2) - matrix.get(0, 0) - matrix.get(1, 1) + 1);
+				final float s = 0.5f / r;
+				x = (matrix.get(2, 0) + matrix.get(0, 2)) * s;
+				y = (matrix.get(1, 2) + matrix.get(2, 1)) * s;
+				z = 0.5f * r;
+				w = (matrix.get(1, 0) - matrix.get(0, 1)) * s;
+			} else {
+				final float r = (float) Math.sqrt(matrix.get(0, 0) - matrix.get(1, 1) - matrix.get(2, 2) + 1);
+				final float s = 0.5f / r;
+				x = 0.5f * r;
+				y = (matrix.get(0, 1) + matrix.get(1, 0)) * s;
+				z = (matrix.get(2, 0) - matrix.get(0, 2)) * s;
+				w = (matrix.get(2, 1) - matrix.get(1, 2)) * s;
+			}
+		} else {
+			final float r = (float) Math.sqrt(trace + 1);
+			final float s = 0.5f / r;
+			x = (matrix.get(2, 1) - matrix.get(1, 2)) * s;
+			y = (matrix.get(0, 2) - matrix.get(2, 0)) * s;
+			z = (matrix.get(1, 0) - matrix.get(0, 1)) * s;
+			w = 0.5f * r;
+		}
+		return new Quaternion(x, y, z, w);
+	}
+
+	/**
+	 * Gets the 3x3 rotation matrix for this quaternion.
+	 *
+	 * @return The rotation matrix3x3
+	 */
+	public static Matrix3x3 MatrixFromQuaternion(Quaternion q) {
+		final float x = q.getX();
+		final float y = q.getY();
+		final float z = q.getZ();
+		final float w = q.getW();
+
+		final float nQ = x * x + y * y + z * z + w * w;
+		final float s;
+		if (nQ > 0.0) {
+			s = 2 / nQ;
+		} else {
+			s = 0;
+		}
+		final float xs = x * s;
+		final float ys = y * s;
+		final float zs = z * s;
+		final float wxs = w * xs;
+		final float wys = w * ys;
+		final float wzs = w * zs;
+		final float xxs = x * xs;
+		final float xys = x * ys;
+		final float xzs = x * zs;
+		final float yys = y * ys;
+		final float yzs = y * zs;
+		final float zzs = z * zs;
+		return new Matrix3x3(
+				1 - yys - zzs, xys - wzs, xzs + wys,
+				xys + wzs, 1 - xxs - zzs, yzs - wxs,
+				xzs - wys, yzs + wxs, 1 - xxs - yys);
+	}
+
+	/**
+	 * Interpolates a quaternion between two others using spherical linear interpolation.
+	 *
+	 * @param quaternion1 The first quaternion
+	 * @param quaternion2 The second quaternion
+	 * @param percent The percent for the interpolation, between 0 and 1 inclusively
+	 * @return The interpolated quaternion
+	 */
+	public static Quaternion slerp(Quaternion quaternion1, Quaternion quaternion2, float percent) {
+		if (percent < 0 && percent > 1) {
+			throw new IllegalArgumentException("\"percent\" must be greater than zero and smaller than one");
+		}
+		final float invert;
+		float cosineTheta = quaternion1.dot(quaternion2);
+		if (cosineTheta < 0) {
+			cosineTheta = -cosineTheta;
+			invert = -1;
+		} else {
+			invert = 1;
+		}
+		final float epsilon = 0.00001f;
+		if (1 - cosineTheta < epsilon) {
+			return quaternion1.mul(1 - percent).add(quaternion2.mul(percent * invert));
+		}
+		final float theta = (float) Math.acos(cosineTheta);
+		final float sineTheta = (float) Math.sin(theta);
+		final float coeff1 = (float) Math.sin((1 - percent) * theta) / sineTheta;
+		final float coeff2 = (float) Math.sin(percent * theta) / sineTheta * invert;
+		return quaternion1.mul(coeff1).add(quaternion2.mul(coeff2));
+	}	
 }

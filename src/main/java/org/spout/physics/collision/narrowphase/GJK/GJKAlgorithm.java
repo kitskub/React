@@ -33,6 +33,7 @@ import org.spout.physics.collision.ContactInfo;
 import org.spout.physics.collision.narrowphase.EPA.EPAAlgorithm;
 import org.spout.physics.collision.narrowphase.NarrowPhaseAlgorithm;
 import org.spout.physics.collision.shape.CollisionShape;
+import org.spout.physics.math.Mathematics;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
 
@@ -61,8 +62,8 @@ public class GJKAlgorithm extends NarrowPhaseAlgorithm {
 		float prevDistSquare;
 		final Transform body2ToBody1 = Transform.multiply(transform1.inverse(), transform2);
 		final Matrix3x3 rotateToBody2 = Matrix3x3.multiply(
-				transform2.getOrientation().getMatrix().getTranspose(),
-				transform1.getOrientation().getMatrix());
+				Mathematics.MatrixFromQuaternion(transform2.getOrientation()).getTranspose(),
+				Mathematics.MatrixFromQuaternion(transform1.getOrientation()));
 		final float margin = collisionShape1.getMargin() + collisionShape2.getMargin();
 		final float marginSquare = margin * margin;
 		if (margin <= 0) {
@@ -90,7 +91,7 @@ public class GJKAlgorithm extends NarrowPhaseAlgorithm {
 				}
 				pA = pA.sub(v.mul(collisionShape1.getMargin() / dist));
 				pB = Transform.multiply(body2ToBody1.inverse(), pB.add(v.mul(collisionShape2.getMargin() / dist)));
-				final Vector3 normal = Matrix3x3.multiply(transform1.getOrientation().getMatrix(), v.normalize().negate());
+				final Vector3 normal = Matrix3x3.multiply(Mathematics.MatrixFromQuaternion(transform1.getOrientation()), v.normalize().negate());
 				final float penetrationDepth = margin - dist;
 				if (penetrationDepth <= 0) {
 					return false;
@@ -109,7 +110,7 @@ public class GJKAlgorithm extends NarrowPhaseAlgorithm {
 				}
 				pA = pA.sub(v.mul(collisionShape1.getMargin() / dist));
 				pB = Transform.multiply(body2ToBody1.inverse(), pB.add(v.mul(collisionShape2.getMargin() / dist)));
-				final Vector3 normal = Matrix3x3.multiply(transform1.getOrientation().getMatrix(), v.normalize().negate());
+				final Vector3 normal = Matrix3x3.multiply(Mathematics.MatrixFromQuaternion(transform1.getOrientation()), v.normalize().negate());
 				final float penetrationDepth = margin - dist;
 				if (penetrationDepth <= 0) {
 					return false;
@@ -128,7 +129,7 @@ public class GJKAlgorithm extends NarrowPhaseAlgorithm {
 				}
 				pA = pA.sub(v.mul(collisionShape1.getMargin() / dist));
 				pB = Transform.multiply(body2ToBody1.inverse(), pB.add(v.mul(collisionShape2.getMargin() / dist)));
-				final Vector3 normal = Matrix3x3.multiply(transform1.getOrientation().getMatrix(), v.normalize().negate());
+				final Vector3 normal = Matrix3x3.multiply(Mathematics.MatrixFromQuaternion(transform1.getOrientation()), v.normalize().negate());
 				final float penetrationDepth = margin - dist;
 				if (penetrationDepth <= 0) {
 					return false;
@@ -151,7 +152,7 @@ public class GJKAlgorithm extends NarrowPhaseAlgorithm {
 				}
 				pA = pA.sub(v.mul(collisionShape1.getMargin() / dist));
 				pB = Transform.multiply(body2ToBody1.inverse(), pB.add(v.mul(collisionShape2.getMargin() / dist)));
-				final Vector3 normal = Matrix3x3.multiply(transform1.getOrientation().getMatrix(), v.normalize().negate());
+				final Vector3 normal = Matrix3x3.multiply(Mathematics.MatrixFromQuaternion(transform1.getOrientation()), v.normalize().negate());
 				final float penetrationDepth = margin - dist;
 				if (penetrationDepth <= 0) {
 					return false;
@@ -181,8 +182,8 @@ public class GJKAlgorithm extends NarrowPhaseAlgorithm {
 		float prevDistSquare;
 		final Transform body2ToBody1 = Transform.multiply(transform1.inverse(), transform2);
 		final Matrix3x3 rotateToBody2 = Matrix3x3.multiply(
-				transform2.getOrientation().getMatrix().getTranspose(),
-				transform1.getOrientation().getMatrix());
+				Mathematics.MatrixFromQuaternion(transform2.getOrientation()).getTranspose(),
+				Mathematics.MatrixFromQuaternion(transform1.getOrientation()));
 		do {
 			suppA = collisionShape1.getLocalSupportPointWithMargin(v.negate());
 			suppB = Transform.multiply(body2ToBody1, collisionShape2.getLocalSupportPointWithMargin(Matrix3x3.multiply(rotateToBody2, v)));

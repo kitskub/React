@@ -29,6 +29,7 @@ package org.spout.physics.collision.shape;
 import org.spout.math.vector.Vector3;
 
 import org.spout.physics.ReactDefaults;
+import org.spout.physics.math.Mathematics;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
 
@@ -103,7 +104,7 @@ public abstract class CollisionShape {
 	 */
 	public void updateAABB(AABB aabb, Transform transform) {
 		final Vector3 extents = getLocalExtents(ReactDefaults.OBJECT_MARGIN);
-		final Matrix3x3 worldAxis = transform.getOrientation().getMatrix().getAbsoluteMatrix();
+		final Matrix3x3 worldAxis = Mathematics.MatrixFromQuaternion(transform.getOrientation()).getAbsoluteMatrix();
 		final Vector3 worldExtents = new Vector3(
 				worldAxis.getColumn(Matrix3x3.FIRST_COLUMN).dot(extents),
 				worldAxis.getColumn(Matrix3x3.SECOND_COLUMN).dot(extents),

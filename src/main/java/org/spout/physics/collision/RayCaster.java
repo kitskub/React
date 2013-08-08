@@ -39,6 +39,7 @@ import org.spout.physics.collision.shape.CollisionShape;
 import org.spout.physics.collision.shape.ConeShape;
 import org.spout.physics.collision.shape.CylinderShape;
 import org.spout.physics.collision.shape.SphereShape;
+import org.spout.physics.math.Mathematics;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
 
@@ -126,7 +127,7 @@ public class RayCaster {
 									  Vector3 intersectionPoint) {
 		final Transform worldToObject = transform.inverse();
 		final Vector3 objRayStart = Transform.multiply(worldToObject, rayStart);
-		final Vector3 objRayDir = Matrix3x3.multiply(worldToObject.getOrientation().getMatrix(), rayDir);
+		final Vector3 objRayDir = Matrix3x3.multiply(Mathematics.MatrixFromQuaternion(worldToObject.getOrientation()), rayDir);
 		final boolean intersects;
 		switch (shape.getType()) {
 			case BOX:

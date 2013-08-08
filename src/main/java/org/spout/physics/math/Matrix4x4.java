@@ -27,6 +27,8 @@
 package org.spout.physics.math;
 
 import java.util.Arrays;
+import org.spout.math.vector.Vector4;
+import org.spout.math.vector.VectorN;
 
 /**
  * Represents a 4x4 matrix.
@@ -64,11 +66,11 @@ public class Matrix4x4 {
 	 * The fourth column of the matrix. Value of 3.
 	 */
 	public static final int FOURTH_COLUMN = 3;
-	private final Vector4[] mRows = {
-			new Vector4(),
-			new Vector4(),
-			new Vector4(),
-			new Vector4()
+	private final VectorN[] mRows = {
+			VectorN.ZERO_4,
+			VectorN.ZERO_4,
+			VectorN.ZERO_4,
+			VectorN.ZERO_4
 	};
 
 	/**
@@ -155,10 +157,10 @@ public class Matrix4x4 {
 								   float b1, float b2, float b3, float b4,
 								   float c1, float c2, float c3, float c4,
 								   float d1, float d2, float d3, float d4) {
-		mRows[0].setAllValues(a1, a2, a3, a4);
-		mRows[1].setAllValues(b1, b2, b3, b4);
-		mRows[2].setAllValues(c1, c2, c3, c4);
-		mRows[3].setAllValues(d1, d2, d3, d4);
+		mRows[0] = new VectorN(a1, a2, a3, a4);
+		mRows[1] = new VectorN(b1, b2, b3, b4);
+		mRows[2] = new VectorN(c1, c2, c3, c4);
+		mRows[3] = new VectorN(d1, d2, d3, d4);
 	}
 
 	/**
@@ -183,7 +185,7 @@ public class Matrix4x4 {
 	 * @return The vector4 for the row
 	 */
 	public Vector4 get(int row) {
-		return mRows[row];
+		return new Vector4(mRows[row]);
 	}
 
 	/**
@@ -194,7 +196,7 @@ public class Matrix4x4 {
 	 * @return The value at the row and column
 	 */
 	public float get(int row, int col) {
-		return mRows[row].get(col);
+		return new VectorN(mRows[row]).get(col);
 	}
 
 	/**
@@ -214,7 +216,7 @@ public class Matrix4x4 {
 	 * @return The vector4 for the row
 	 */
 	public Vector4 getRow(int row) {
-		return mRows[row];
+		return new Vector4(mRows[row]);
 	}
 
 	/**
@@ -232,20 +234,20 @@ public class Matrix4x4 {
 	 * Sets all the values at zero.
 	 */
 	public void setToZero() {
-		mRows[0].setToZero();
-		mRows[1].setToZero();
-		mRows[2].setToZero();
-		mRows[3].setToZero();
+		mRows[0] = VectorN.ZERO_4;
+		mRows[1] = VectorN.ZERO_4;
+		mRows[2] = VectorN.ZERO_4;
+		mRows[3] = VectorN.ZERO_4;
 	}
 
 	/**
 	 * Sets all the matrix values to identity.
 	 */
 	public void setToIdentity() {
-		mRows[0].setAllValues(1, 0, 0, 0);
-		mRows[1].setAllValues(0, 1, 0, 0);
-		mRows[2].setAllValues(0, 0, 1, 0);
-		mRows[3].setAllValues(0, 0, 0, 1);
+		mRows[0] = new VectorN(1, 0, 0, 0);
+		mRows[1] = new VectorN(0, 1, 0, 0);
+		mRows[2] = new VectorN(0, 0, 1, 0);
+		mRows[3] = new VectorN(0, 0, 0, 1);
 	}
 
 	/**

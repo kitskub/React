@@ -29,8 +29,8 @@ package org.spout.physics.collision.narrowphase.EPA;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Vector;
 
+import org.spout.math.imaginary.Quaternion;
 import org.spout.math.vector.Vector3;
 
 import org.spout.physics.ReactDefaults;
@@ -40,7 +40,6 @@ import org.spout.physics.collision.narrowphase.GJK.Simplex;
 import org.spout.physics.collision.shape.CollisionShape;
 import org.spout.physics.math.Mathematics;
 import org.spout.physics.math.Matrix3x3;
-import org.spout.physics.math.Quaternion;
 import org.spout.physics.math.Transform;
 
 /**
@@ -78,7 +77,7 @@ public class EPAAlgorithm {
 		final TrianglesStore triangleStore = new TrianglesStore();
 		final Queue<TriangleEPA> triangleHeap = new PriorityQueue<TriangleEPA>(MAX_FACETS, new TriangleComparison());
 		final Transform body2Tobody1 = Transform.multiply(transform1.inverse(), transform2);
-		final Matrix3x3 rotateToBody2 = Matrix3x3.multiply(transform2.getOrientation().getMatrix().getTranspose(), transform1.getOrientation().getMatrix());
+		final Matrix3x3 rotateToBody2 = Matrix3x3.multiply(Mathematics.MatrixFromQuaternion(transform2.getOrientation()).getTranspose(), Mathematics.MatrixFromQuaternion(transform1.getOrientation()));
 		int nbVertices = simplex.getSimplex(suppPointsA, suppPointsB, points);
 		final float tolerance = ReactDefaults.MACHINE_EPSILON * simplex.getMaxLengthSquareOfAPoint();
 		int nbTriangles = 0;
@@ -91,7 +90,7 @@ public class EPAAlgorithm {
 				final int minAxis = Mathematics.getMinAxis(d.abs());
 				final float sin60 = (float) Math.sqrt(3) * 0.5f;
 				final Quaternion rotationQuat = new Quaternion(d.getX() * sin60, d.getY() * sin60, d.getZ() * sin60, 0.5f);
-				final Matrix3x3 rotationMat = rotationQuat.getMatrix();
+				final Matrix3x3 rotationMat = Mathematics.MatrixFromQuaternion(rotationQuat);
 				final Vector3 v1 = d.cross(new Vector3(minAxis == 0 ? 1 : 0, minAxis == 1 ? 1 : 0, minAxis == 2 ? 1 : 0));
 				final Vector3 v2 = Matrix3x3.multiply(rotationMat, v1);
 				final Vector3 v3 = Matrix3x3.multiply(rotationMat, v2);
@@ -245,7 +244,7 @@ public class EPAAlgorithm {
 			}
 		}
 		while (nbTriangles > 0 && triangleHeap.element().getDistSquare() <= upperBoundSquarePenDepth);
-		Vector3 v = Matrix3x3.multiply(transform1.getOrientation().getMatrix(), triangle.getClosestPoint());
+		Vector3 v = Matrix3x3.multiply(Mathematics.MatrixFromQuaternion(transform1.getOrientation()), triangle.getClosestPoint());
 		final Vector3 pALocal = triangle.computeClosestPointOfObject(suppPointsA);
 		final Vector3 pBLocal = Transform.multiply(body2Tobody1.inverse(), triangle.computeClosestPointOfObject(suppPointsB));
 		final Vector3 normal = v.normalize();

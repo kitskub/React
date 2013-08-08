@@ -30,6 +30,7 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.spout.math.imaginary.Quaternion;
 import org.spout.math.vector.Vector3;
 
 import org.spout.physics.body.CollisionBody;
@@ -42,6 +43,7 @@ import org.spout.physics.collision.shape.CollisionShape;
 import org.spout.physics.collision.shape.ConeShape;
 import org.spout.physics.collision.shape.CylinderShape;
 import org.spout.physics.collision.shape.SphereShape;
+import org.spout.physics.math.Mathematics;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
 
@@ -190,7 +192,7 @@ public class GJKAndEPAAlgorithmTest {
 				throw new IllegalStateException("Unknown collision shape for s2");
 		}
 		in = Transform.multiply(t1, in);
-		surface = Matrix3x3.multiply(t2.getOrientation().getMatrix(), surface);
+		surface = Matrix3x3.multiply(Mathematics.MatrixFromQuaternion(t2.getOrientation()), surface);
 		surface = surface.mul(0.95f);
 		t2.setPosition(in.sub(surface));
 	}

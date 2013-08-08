@@ -26,6 +26,7 @@
  */
 package org.spout.physics.math;
 
+import org.spout.math.imaginary.Quaternion;
 import org.spout.math.vector.Vector3;
 
 /**
@@ -39,7 +40,7 @@ public class Transform {
 	 * Default constructor. Position will be the zero vector and the rotation, quaternion identity.
 	 */
 	public Transform() {
-		this(new Vector3(0, 0, 0), Quaternion.identity());
+		this(new Vector3(0, 0, 0), Quaternion.IDENTITY);
 	}
 
 	/**
@@ -49,7 +50,7 @@ public class Transform {
 	 * @param orientation The orientation
 	 */
 	public Transform(Vector3 position, Matrix3x3 orientation) {
-		this(position, new Quaternion(orientation));
+		this(position, Mathematics.QuaternionFromMatrix(orientation));
 	}
 
 	/**
@@ -60,7 +61,7 @@ public class Transform {
 	 */
 	public Transform(Vector3 position, Quaternion orientation) {
 		this.mPosition = position;
-		this.mOrientation.set(orientation);
+		this.mOrientation = orientation;
 	}
 
 	/**
@@ -105,7 +106,7 @@ public class Transform {
 	 * @param orientation The position to set
 	 */
 	public void setOrientation(Quaternion orientation) {
-		mOrientation.set(orientation);
+		mOrientation = orientation;
 	}
 
 	/**
@@ -115,7 +116,7 @@ public class Transform {
 	 */
 	public Transform set(Transform transform) {
 		mPosition = transform.getPosition();
-		mOrientation.set(transform.getOrientation());
+		mOrientation = transform.getOrientation();
 		return this;
 	}
 
@@ -124,7 +125,7 @@ public class Transform {
 	 */
 	public void setToIdentity() {
 		mPosition = new Vector3(0, 0, 0);
-		mOrientation.set(Quaternion.identity());
+		mOrientation = Quaternion.IDENTITY;;
 	}
 
 	/**
@@ -133,8 +134,8 @@ public class Transform {
 	 * @return The transform which is the inverse of this one
 	 */
 	public Transform inverse() {
-		final Quaternion invQuaternion = mOrientation.getInverse();
-		final Matrix3x3 invMatrix = invQuaternion.getMatrix();
+		final Quaternion invQuaternion = mOrientation.invert();
+		final Matrix3x3 invMatrix = Mathematics.MatrixFromQuaternion(invQuaternion);
 		return new Transform(Matrix3x3.multiply(invMatrix, mPosition.negate()), invQuaternion);
 	}
 
@@ -172,7 +173,7 @@ public class Transform {
 	 * @return A new identity transform
 	 */
 	public static Transform identity() {
-		return new Transform(new Vector3(0, 0, 0), Quaternion.identity());
+		return new Transform(new Vector3(0, 0, 0), Quaternion.IDENTITY);
 	}
 
 	/**
@@ -183,7 +184,7 @@ public class Transform {
 	 * @return The result of the multiplication of the transform by a vector3 as a new vector3
 	 */
 	public static Vector3 multiply(Transform transform, Vector3 vector) {
-		return Matrix3x3.multiply(transform.getOrientation().getMatrix(), vector).add(transform.getPosition());
+		return Matrix3x3.multiply(Mathematics.MatrixFromQuaternion(transform.getOrientation()), vector).add(transform.getPosition());
 	}
 
 	/**
@@ -195,8 +196,8 @@ public class Transform {
 	 */
 	public static Transform multiply(Transform transform1, Transform transform2) {
 		return new Transform(
-				transform1.getPosition().add(Matrix3x3.multiply(transform1.getOrientation().getMatrix(), transform2.getPosition())),
-				Quaternion.multiply(transform1.getOrientation(), transform2.getOrientation()));
+				transform1.getPosition().add(Matrix3x3.multiply(Mathematics.MatrixFromQuaternion(transform1.getOrientation()), transform2.getPosition())),
+				transform1.getOrientation().mul(transform2.getOrientation()));
 	}
 
 	/**
@@ -209,7 +210,7 @@ public class Transform {
 	 */
 	public static Transform interpolateTransforms(Transform transform1, Transform transform2, float percent) {
 		final Vector3 interPosition = transform1.getPosition().mul(1 - percent).add(transform2.getPosition().mul(percent));
-		final Quaternion interOrientation = Quaternion.slerp(transform1.getOrientation(), transform2.getOrientation(), percent);
+		final Quaternion interOrientation = Mathematics.slerp(transform1.getOrientation(), transform2.getOrientation(), percent);
 		return new Transform(interPosition, interOrientation);
 	}
 }

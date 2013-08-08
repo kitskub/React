@@ -29,6 +29,7 @@ package org.spout.physics.body;
 import org.spout.math.vector.Vector3;
 
 import org.spout.physics.collision.shape.CollisionShape;
+import org.spout.physics.math.Mathematics;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
 
@@ -114,13 +115,13 @@ public class ImmobileRigidBody extends RigidBody {
 	 * @return The world inertia tensor
 	 */
 	public Matrix3x3 getInertiaTensorWorld() {
-		final Matrix3x3 orientation = mliveTransform.getOrientation().getMatrix();
+		final Matrix3x3 orientation = Mathematics.MatrixFromQuaternion(mliveTransform.getOrientation());
 		return Matrix3x3.multiply(Matrix3x3.multiply(orientation, mInertiaTensorLocal), orientation.getTranspose());
 	}
 
 	@Override
 	public Matrix3x3 getInertiaTensorInverseWorld() {
-		final Matrix3x3 orientation = mliveTransform.getOrientation().getMatrix();
+		final Matrix3x3 orientation = Mathematics.MatrixFromQuaternion(mliveTransform.getOrientation());
 		return Matrix3x3.multiply(Matrix3x3.multiply(orientation, mInertiaTensorLocalInverse), orientation.getTranspose());
 	}
 

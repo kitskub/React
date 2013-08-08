@@ -28,6 +28,7 @@ package org.spout.physics;
 
 import java.util.Random;
 
+import org.spout.math.imaginary.Quaternion;
 import org.spout.math.vector.Vector3;
 
 import org.spout.physics.body.CollisionBody;
@@ -43,7 +44,6 @@ import org.spout.physics.collision.shape.CylinderShape;
 import org.spout.physics.collision.shape.SphereShape;
 import org.spout.physics.engine.CollisionWorld;
 import org.spout.physics.math.Matrix3x3;
-import org.spout.physics.math.Quaternion;
 import org.spout.physics.math.Transform;
 
 /**

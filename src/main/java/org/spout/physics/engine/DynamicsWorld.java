@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.spout.math.imaginary.Quaternion;
 
 import org.spout.math.vector.Vector3;
 
@@ -48,7 +49,6 @@ import org.spout.physics.collision.shape.CollisionShape;
 import org.spout.physics.constraint.Constraint;
 import org.spout.physics.constraint.ContactPoint;
 import org.spout.physics.math.Matrix3x3;
-import org.spout.physics.math.Quaternion;
 import org.spout.physics.math.Transform;
 
 /**
@@ -310,14 +310,8 @@ public class DynamicsWorld extends CollisionWorld {
 				final Vector3 currentPosition = mobileBody.getTransform().getPosition();
 				final Quaternion currentOrientation = mobileBody.getTransform().getOrientation();
 				final Vector3 newPosition = currentPosition.add(newLinVelocity.mul(dt));
-				final Quaternion newOrientation = Quaternion.add(
-						currentOrientation,
-						Quaternion.multiply(
-								Quaternion.multiply(
-										new Quaternion(newAngVelocity.getX(), newAngVelocity.getY(), newAngVelocity.getZ(), 0),
-										currentOrientation),
-								0.5f * dt));
-				final Transform newTransform = new Transform(newPosition, newOrientation.getUnit());
+				final Quaternion newOrientation = currentOrientation.add(new Quaternion(newAngVelocity.getX(), newAngVelocity.getY(), newAngVelocity.getZ(), 0).mul(currentOrientation).mul(0.5f * dt));
+				final Transform newTransform = new Transform(newPosition, newOrientation.normalize());
 				mobileBody.setTransform(newTransform);
 				mobileBody.updateAABB();
 			}
