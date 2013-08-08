@@ -26,9 +26,10 @@
  */
 package org.spout.physics.collision.shape;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.ReactDefaults;
 import org.spout.physics.math.Matrix3x3;
-import org.spout.physics.math.Vector3;
 
 /**
  * Represents a cone collision shape centered at the origin and aligned with the Y axis. The cone is defined by its height and by the radius of its base. The center of the cone is at the half of the
@@ -98,14 +99,14 @@ public class ConeShape extends CollisionShape {
 
 	@Override
 	public Vector3 getLocalSupportPointWithMargin(Vector3 direction) {
-		final Vector3 supportPoint = getLocalSupportPointWithoutMargin(direction);
+		Vector3 supportPoint = getLocalSupportPointWithoutMargin(direction);
 		final Vector3 unitVec;
-		if (direction.lengthSquare() > ReactDefaults.MACHINE_EPSILON * ReactDefaults.MACHINE_EPSILON) {
-			unitVec = direction.getUnit();
+		if (direction.lengthSquared() > ReactDefaults.MACHINE_EPSILON * ReactDefaults.MACHINE_EPSILON) {
+			unitVec = direction.normalize();
 		} else {
 			unitVec = new Vector3(0, -1, 0);
 		}
-		supportPoint.add(Vector3.multiply(unitVec, getMargin()));
+		supportPoint = supportPoint.add(unitVec.mul(getMargin()));
 		return supportPoint;
 	}
 

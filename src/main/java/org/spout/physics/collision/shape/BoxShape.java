@@ -26,16 +26,17 @@
  */
 package org.spout.physics.collision.shape;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.ReactDefaults;
 import org.spout.physics.math.Matrix3x3;
-import org.spout.physics.math.Vector3;
 
 /**
  * Represents a 3D box shape. Those axis are unit length. The three extents are half-lengths of the box along the three x, y, z local axes. The "transform" of the corresponding rigid body gives an
  * orientation and a position to the box.
  */
 public class BoxShape extends CollisionShape {
-	private final Vector3 mExtent = new Vector3();
+	private Vector3 mExtent = Vector3.ZERO;
 
 	/**
 	 * Constructs a box shape from its extents which is half the vector between the two opposing corners that are the furthest away.
@@ -46,7 +47,7 @@ public class BoxShape extends CollisionShape {
 	 */
 	public BoxShape(float x, float y, float z) {
 		super(CollisionShapeType.BOX);
-		mExtent.setAllValues(x, y, z);
+		mExtent = new Vector3(x, y, z);
 	}
 
 	/**
@@ -56,7 +57,7 @@ public class BoxShape extends CollisionShape {
 	 */
 	public BoxShape(Vector3 extent) {
 		super(CollisionShapeType.BOX);
-		mExtent.set(extent);
+		mExtent = extent;
 	}
 
 	/**
@@ -74,7 +75,7 @@ public class BoxShape extends CollisionShape {
 	 * @param extent The extents vector
 	 */
 	public void setExtent(Vector3 extent) {
-		mExtent.set(extent);
+		mExtent = extent;
 	}
 
 	@Override
@@ -99,7 +100,7 @@ public class BoxShape extends CollisionShape {
 
 	@Override
 	public Vector3 getLocalExtents(float margin) {
-		return Vector3.add(mExtent, new Vector3(margin, margin, margin));
+		return mExtent.add(new Vector3(margin, margin, margin));
 	}
 
 	@Override

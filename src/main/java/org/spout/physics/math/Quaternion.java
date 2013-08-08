@@ -26,6 +26,8 @@
  */
 package org.spout.physics.math;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.ReactDefaults;
 
 /**
@@ -314,12 +316,12 @@ public class Quaternion {
 		return x * quaternion.getX() + y * quaternion.getY() + z * quaternion.getZ() + w * quaternion.getW();
 	}
 
-	/**
+	/*/**
 	 * Gets the rotation represented as an angle around an axis. The angle part is returned by the method, while the axis, represented as a vector, will be stored in the passed vector parameter.
 	 *
 	 * @param axis The vector in which to store the axis component values
 	 * @return The angle as a float
-	 */
+	 *
 	public float getRotationAngleAxis(Vector3 axis) {
 		final Quaternion quaternion;
 		if (length() == 1) {
@@ -327,10 +329,10 @@ public class Quaternion {
 		} else {
 			quaternion = getUnit();
 		}
-		final Vector3 rotationAxis = new Vector3(quaternion.getX(), quaternion.getY(), quaternion.getZ()).getUnit();
+		final Vector3 rotationAxis = new Vector3(quaternion.getX(), quaternion.getY(), quaternion.getZ()).normalize();
 		axis.setAllValues(rotationAxis.getX(), rotationAxis.getY(), rotationAxis.getZ());
 		return (float) Math.acos(quaternion.getW()) * 2;
-	}
+	}*/
 
 	/**
 	 * Gets the 3x3 rotation matrix for this quaternion.
@@ -463,7 +465,7 @@ public class Quaternion {
 	public static Quaternion multiply(Quaternion quaternion1, Quaternion quaternion2) {
 		return new Quaternion(
 				quaternion1.getW() * quaternion2.getW() - quaternion1.getVectorV().dot(quaternion2.getVectorV()),
-				quaternion2.getVectorV().multiply(quaternion1.getW()).add(quaternion1.getVectorV().multiply(quaternion2.getW())).
+				quaternion2.getVectorV().mul(quaternion1.getW()).add(quaternion1.getVectorV().mul(quaternion2.getW())).
 						add(quaternion1.getVectorV().cross(quaternion2.getVectorV())));
 	}
 

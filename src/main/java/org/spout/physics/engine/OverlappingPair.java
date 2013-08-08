@@ -26,9 +26,10 @@
  */
 package org.spout.physics.engine;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.body.CollisionBody;
 import org.spout.physics.constraint.ContactPoint;
-import org.spout.physics.math.Vector3;
 
 /**
  * Represents a pair of two bodies that are overlapping during the broad-phase collision detection. It is created when the two bodies start to overlap and is destroyed when they do not overlap
@@ -38,7 +39,7 @@ public class OverlappingPair {
 	private final CollisionBody mBody1;
 	private final CollisionBody mBody2;
 	private final ContactManifold mContactManifold = new ContactManifold();
-	private final Vector3 mCachedSeparatingAxis = new Vector3(1, 1, 1);
+	private Vector3 mCachedSeparatingAxis = new Vector3(1, 1, 1);
 
 	/**
 	 * Constructs a new overlapping pair from the first and second body.
@@ -100,7 +101,7 @@ public class OverlappingPair {
 	 * @param axis The separating axis to set
 	 */
 	public void setCachedSeparatingAxis(Vector3 axis) {
-		mCachedSeparatingAxis.set(axis);
+		mCachedSeparatingAxis = axis;
 	}
 
 	/**

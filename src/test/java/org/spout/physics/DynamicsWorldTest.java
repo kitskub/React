@@ -28,6 +28,8 @@ package org.spout.physics;
 
 import org.junit.Test;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.body.ImmobileRigidBody;
 import org.spout.physics.body.MobileRigidBody;
 import org.spout.physics.collision.shape.BoxShape;
@@ -35,7 +37,6 @@ import org.spout.physics.engine.DynamicsWorld;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Quaternion;
 import org.spout.physics.math.Transform;
-import org.spout.physics.math.Vector3;
 
 public class DynamicsWorldTest {
 	private static final float RUN_TIME = 2;

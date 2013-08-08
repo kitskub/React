@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.body.CollisionBody;
 import org.spout.physics.collision.shape.BoxShape;
 import org.spout.physics.collision.shape.CollisionShape;
@@ -39,7 +41,6 @@ import org.spout.physics.collision.shape.CylinderShape;
 import org.spout.physics.collision.shape.SphereShape;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
-import org.spout.physics.math.Vector3;
 
 /**
  * Performs ray casting on collision shapes, finding the ones that intersect the ray.
@@ -62,7 +63,7 @@ public class RayCaster {
 		Vector3 closestIntersectionPoint = null;
 		for (Entry<CollisionBody, Vector3> entry : intersecting.entrySet()) {
 			final Vector3 intersectionPoint = entry.getValue();
-			final float distance = Vector3.subtract(intersectionPoint, rayStart).lengthSquare();
+			final float distance = intersectionPoint.sub(rayStart).lengthSquared();
 			if (distance < closestDistance) {
 				closest = entry.getKey();
 				closestDistance = distance;
@@ -89,7 +90,7 @@ public class RayCaster {
 		Vector3 furthestIntersectionPoint = null;
 		for (Entry<CollisionBody, Vector3> entry : intersecting.entrySet()) {
 			final Vector3 intersectionPoint = entry.getValue();
-			final float distance = Vector3.subtract(intersectionPoint, rayStart).lengthSquare();
+			final float distance = intersectionPoint.sub(rayStart).lengthSquared();
 			if (distance > furthestDistance) {
 				furthest = entry.getKey();
 				furthestDistance = distance;
@@ -110,7 +111,7 @@ public class RayCaster {
 	public static Map<CollisionBody, Vector3> findIntersectingBodies(Vector3 rayStart, Vector3 rayDir,
 																	 Collection<CollisionBody> bodies) {
 		final Map<CollisionBody, Vector3> intersecting = new HashMap<CollisionBody, Vector3>();
-		final Vector3 intersectionPoint = new Vector3();
+		final Vector3 intersectionPoint = Vector3.ZERO;
 		for (CollisionBody body : bodies) {
 			if (intersects(rayStart, rayDir, body.getCollisionShape(), body.getTransform(), intersectionPoint)) {
 				intersecting.put(body, new Vector3(intersectionPoint));
@@ -144,7 +145,7 @@ public class RayCaster {
 				throw new IllegalArgumentException("unknown collision shape");
 		}
 		if (intersects) {
-			intersectionPoint.set(Transform.multiply(transform, intersectionPoint));
+			intersectionPoint = Transform.multiply(transform, intersectionPoint);
 			return true;
 		}
 		return false;
@@ -154,7 +155,7 @@ public class RayCaster {
 	private static boolean intersects(Vector3 rayStart, Vector3 rayDir,
 									  BoxShape box, Vector3 intersectionPoint) {
 		final Vector3 extent = box.getExtent();
-		final Vector3 min = Vector3.negate(extent);
+		final Vector3 min = extent.negate();
 		final Vector3 max = extent;
 		float t0;
 		float t1;
@@ -208,7 +209,7 @@ public class RayCaster {
 			} else {
 				t = t1;
 			}
-			intersectionPoint.set(Vector3.add(rayStart, Vector3.multiply(rayDir, t)));
+			intersectionPoint = rayStart.add(rayDir.mul(t));
 			return true;
 		}
 		return false;
@@ -218,7 +219,7 @@ public class RayCaster {
 	private static boolean intersects(Vector3 rayStart, Vector3 rayDir,
 									  SphereShape sphere, Vector3 intersectionPoint) {
 		final float a = rayDir.dot(rayDir);
-		final float b = Vector3.multiply(rayDir, 2).dot(rayStart);
+		final float b = rayDir.mul(2).dot(rayStart);
 		final float r = sphere.getRadius();
 		final float c = rayStart.dot(rayStart) - r * r;
 		final float discriminant = b * b - 4 * a * c;
@@ -240,7 +241,7 @@ public class RayCaster {
 			} else {
 				t = t1;
 			}
-			intersectionPoint.set(Vector3.add(rayStart, Vector3.multiply(rayDir, t)));
+			intersectionPoint = rayStart.add(rayDir.mul(t));
 			return true;
 		}
 		return false;
@@ -295,7 +296,7 @@ public class RayCaster {
 		}
 		final float t = tc0 < tc1 ? (tc0 < tb ? tc0 : tb) : (tc1 < tb ? tc1 : tb);
 		if (t != Float.MAX_VALUE) {
-			intersectionPoint.set(Vector3.add(rayStart, Vector3.multiply(rayDir, t)));
+			intersectionPoint = rayStart.add(rayDir.mul(t));
 			return true;
 		}
 		return false;
@@ -367,7 +368,7 @@ public class RayCaster {
 			t = tb1;
 		}
 		if (t != Float.MAX_VALUE) {
-			intersectionPoint.set(Vector3.add(rayStart, Vector3.multiply(rayDir, t)));
+			intersectionPoint = rayStart.add(rayDir.mul(t));
 			return true;
 		}
 		return false;

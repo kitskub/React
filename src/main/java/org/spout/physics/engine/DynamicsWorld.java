@@ -33,6 +33,8 @@ import java.util.Vector;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.ReactDefaults;
 import org.spout.physics.Utilities.IntPair;
 import org.spout.physics.body.GhostImmobileRigidBody;
@@ -48,7 +50,6 @@ import org.spout.physics.constraint.ContactPoint;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Quaternion;
 import org.spout.physics.math.Transform;
-import org.spout.physics.math.Vector3;
 
 /**
  * This class represents a dynamics world. This class inherits from the CollisionWorld class. In a dynamics world bodies can collide and their movements are simulated using the laws of physics.
@@ -308,7 +309,7 @@ public class DynamicsWorld extends CollisionWorld {
 				}
 				final Vector3 currentPosition = mobileBody.getTransform().getPosition();
 				final Quaternion currentOrientation = mobileBody.getTransform().getOrientation();
-				final Vector3 newPosition = Vector3.add(currentPosition, Vector3.multiply(newLinVelocity, dt));
+				final Vector3 newPosition = currentPosition.add(newLinVelocity.mul(dt));
 				final Quaternion newOrientation = Quaternion.add(
 						currentOrientation,
 						Quaternion.multiply(
@@ -352,11 +353,9 @@ public class DynamicsWorld extends CollisionWorld {
 		int i = 0;
 		for (RigidBody rigidBody : mRigidBodies) {
 			mMapBodyToConstrainedVelocityIndex.put(rigidBody, i);
-			mConstrainedLinearVelocities.add(i, Vector3.add(
-					rigidBody.getLinearVelocity(),
-					Vector3.multiply(dt * rigidBody.getMassInverse(), rigidBody.getExternalForce())));
-			mConstrainedAngularVelocities.add(i, Vector3.add(
-					rigidBody.getAngularVelocity(),
+			mConstrainedLinearVelocities.add(i,rigidBody.getLinearVelocity().add(rigidBody.getExternalForce().mul(dt * rigidBody.getMassInverse())));
+			mConstrainedAngularVelocities.add(i,
+					rigidBody.getAngularVelocity().add(
 					Matrix3x3.multiply(
 							Matrix3x3.multiply(dt, rigidBody.getInertiaTensorInverseWorld()),
 							rigidBody.getExternalTorque())));
@@ -378,7 +377,7 @@ public class DynamicsWorld extends CollisionWorld {
 				if (rigidBody == null) {
 					throw new IllegalStateException("rigid body cannot be null");
 				}
-				rigidBody.setExternalForce(Vector3.multiply(rigidBody.getMass(), mGravity));
+				rigidBody.setExternalForce(mGravity.mul(rigidBody.getMass()));
 			}
 		}
 	}

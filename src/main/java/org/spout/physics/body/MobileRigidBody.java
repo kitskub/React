@@ -26,17 +26,18 @@
  */
 package org.spout.physics.body;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.collision.shape.CollisionShape;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
-import org.spout.physics.math.Vector3;
 
 /**
  * Represents a mobile rigid body. Such a body can move and has all of the properties of a normal rigid body.
  */
 public class MobileRigidBody extends ImmobileRigidBody {
-	private final Vector3 mLinearVelocity = new Vector3();
-	private final Vector3 mAngularVelocity = new Vector3();
+	private Vector3 mLinearVelocity = Vector3.ZERO;
+	private Vector3 mAngularVelocity = Vector3.ZERO;
 	private boolean mIsMotionEnabled = true;
 
 	/**
@@ -71,7 +72,7 @@ public class MobileRigidBody extends ImmobileRigidBody {
 	 */
 	public void setLinearVelocity(Vector3 linearVelocity) {
 		if (mIsMotionEnabled) {
-			mLinearVelocity.set(linearVelocity);
+			mLinearVelocity = linearVelocity;
 		}
 	}
 
@@ -91,7 +92,7 @@ public class MobileRigidBody extends ImmobileRigidBody {
 	 * @param angularVelocity The angular velocity to set
 	 */
 	public void setAngularVelocity(Vector3 angularVelocity) {
-		mAngularVelocity.set(angularVelocity);
+		mAngularVelocity = angularVelocity;
 	}
 
 	/**

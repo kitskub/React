@@ -26,10 +26,11 @@
  */
 package org.spout.physics.body;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.collision.shape.CollisionShape;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
-import org.spout.physics.math.Vector3;
 
 /**
  * Represents an immobile rigid body. Such a body cannot move, but has all of the properties of a normal rigid body, except for velocities. This can be used for scenery, floors, walls, etc.
@@ -39,8 +40,8 @@ public class ImmobileRigidBody extends RigidBody {
 	protected float mMass;
 	protected final Matrix3x3 mInertiaTensorLocal = new Matrix3x3();
 	protected final Matrix3x3 mInertiaTensorLocalInverse = new Matrix3x3();
-	protected final Vector3 mExternalForce = new Vector3();
-	protected final Vector3 mExternalTorque = new Vector3();
+	protected Vector3 mExternalForce = Vector3.ZERO;
+	protected Vector3 mExternalTorque = Vector3.ZERO;
 
 	/**
 	 * Constructs a new rigid body from its transform, mass, local inertia tensor, collision shape and ID.
@@ -130,7 +131,7 @@ public class ImmobileRigidBody extends RigidBody {
 
 	@Override
 	public void setExternalForce(Vector3 force) {
-		mExternalForce.set(force);
+		mExternalForce = force;
 	}
 
 	@Override
@@ -140,7 +141,7 @@ public class ImmobileRigidBody extends RigidBody {
 
 	@Override
 	public void setExternalTorque(Vector3 torque) {
-		mExternalTorque.set(torque);
+		mExternalTorque = torque;
 	}
 
 	/**

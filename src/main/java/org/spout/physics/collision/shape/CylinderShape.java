@@ -26,9 +26,10 @@
  */
 package org.spout.physics.collision.shape;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.ReactDefaults;
 import org.spout.physics.math.Matrix3x3;
-import org.spout.physics.math.Vector3;
 
 /**
  * Represents a cylinder collision shape around the Y axis and centered at the origin. The cylinder is defined by its height and the radius of its base. The "transform" of the corresponding rigid body
@@ -88,35 +89,35 @@ public class CylinderShape extends CollisionShape {
 
 	@Override
 	public Vector3 getLocalSupportPointWithMargin(Vector3 direction) {
-		final Vector3 supportPoint = getLocalSupportPointWithoutMargin(direction);
+		Vector3 supportPoint = getLocalSupportPointWithoutMargin(direction);
 		final Vector3 unitVec;
-		if (direction.lengthSquare() > ReactDefaults.MACHINE_EPSILON * ReactDefaults.MACHINE_EPSILON) {
-			unitVec = direction.getUnit();
+		if (direction.lengthSquared() > ReactDefaults.MACHINE_EPSILON * ReactDefaults.MACHINE_EPSILON) {
+			unitVec = direction.normalize();
 		} else {
 			unitVec = new Vector3(0, 1, 0);
 		}
-		supportPoint.add(Vector3.multiply(unitVec, getMargin()));
+		supportPoint = supportPoint.add(unitVec.mul(getMargin()));
 		return supportPoint;
 	}
 
 	@Override
 	public Vector3 getLocalSupportPointWithoutMargin(Vector3 direction) {
-		final Vector3 supportPoint = new Vector3(0, 0, 0);
+		Vector3 supportPoint = new Vector3(0, 0, 0);
 		final float uDotv = direction.getY();
 		final Vector3 w = new Vector3(direction.getX(), 0, direction.getZ());
 		final float lengthW = (float) Math.sqrt(direction.getX() * direction.getX() + direction.getZ() * direction.getZ());
 		if (lengthW > ReactDefaults.MACHINE_EPSILON) {
 			if (uDotv < 0.0) {
-				supportPoint.setY(-mHalfHeight);
+				supportPoint = new Vector3(supportPoint.getX(), -mHalfHeight, supportPoint.getZ());
 			} else {
-				supportPoint.setY(mHalfHeight);
+				supportPoint = new Vector3(supportPoint.getX(), mHalfHeight, supportPoint.getZ());
 			}
-			supportPoint.add(Vector3.multiply(mRadius / lengthW, w));
+			supportPoint = supportPoint.add(w.mul(mRadius / lengthW));
 		} else {
 			if (uDotv < 0.0) {
-				supportPoint.setY(-mHalfHeight);
+				supportPoint = new Vector3(supportPoint.getX(), -mHalfHeight, supportPoint.getZ());
 			} else {
-				supportPoint.setY(mHalfHeight);
+				supportPoint = new Vector3(supportPoint.getX(), mHalfHeight, supportPoint.getZ());
 			}
 		}
 		return supportPoint;

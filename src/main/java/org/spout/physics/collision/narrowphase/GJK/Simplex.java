@@ -26,7 +26,7 @@
  */
 package org.spout.physics.collision.narrowphase.GJK;
 
-import org.spout.physics.math.Vector3;
+import org.spout.math.vector.Vector3;
 
 /**
  * Represents a simplex which is a set of 3D points. This class is used in the GJK algorithm. This implementation is based on the implementation discussed in the book "Collision Detection in 3D
@@ -34,21 +34,21 @@ import org.spout.physics.math.Vector3;
  */
 public class Simplex {
 	private final Vector3[] mPoints = {
-			new Vector3(), new Vector3(), new Vector3(), new Vector3()
+			Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO
 	};
 	private final float[] mPointsLengthSquare = new float[4];
 	private float mMaxLengthSquare;
 	private final Vector3[] mSuppPointsA = {
-			new Vector3(), new Vector3(), new Vector3(), new Vector3()
+			Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO
 	};
 	private final Vector3[] mSuppPointsB = {
-			new Vector3(), new Vector3(), new Vector3(), new Vector3()
+			Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO
 	};
 	private final Vector3[][] mDiffLength = {
-			{new Vector3(), new Vector3(), new Vector3(), new Vector3()},
-			{new Vector3(), new Vector3(), new Vector3(), new Vector3()},
-			{new Vector3(), new Vector3(), new Vector3(), new Vector3()},
-			{new Vector3(), new Vector3(), new Vector3(), new Vector3()}
+			{Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO},
+			{Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO},
+			{Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO},
+			{Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO}
 	};
 	private final float[][] mDet = new float[16][4];
 	private final float[][] mNormSquare = new float[4][4];
@@ -109,13 +109,13 @@ public class Simplex {
 		if (mLastFound < 0 && mLastFound >= 4) {
 			throw new IllegalStateException("lastFount must be greater or equal to zero and smaller than four");
 		}
-		mPoints[mLastFound].set(point);
+		mPoints[mLastFound] = point;
 		mPointsLengthSquare[mLastFound] = point.dot(point);
 		mAllBits = mBitsCurrentSimplex | mLastFoundBit;
 		updateCache();
 		computeDeterminants();
-		mSuppPointsA[mLastFound].set(suppPointA);
-		mSuppPointsB[mLastFound].set(suppPointB);
+		mSuppPointsA[mLastFound] = suppPointA;
+		mSuppPointsB[mLastFound] = suppPointB;
 	}
 
 	/**
@@ -137,8 +137,8 @@ public class Simplex {
 	private void updateCache() {
 		for (int i = 0, bit = 0x1; i < 4; i++, bit <<= 1) {
 			if (overlap(mBitsCurrentSimplex, bit)) {
-				mDiffLength[i][mLastFound] = Vector3.subtract(mPoints[i], mPoints[mLastFound]);
-				mDiffLength[mLastFound][i] = Vector3.negate(mDiffLength[i][mLastFound]);
+				mDiffLength[i][mLastFound] = mPoints[i].sub(mPoints[mLastFound]);
+				mDiffLength[mLastFound][i] = mDiffLength[i][mLastFound].negate();
 				mNormSquare[i][mLastFound] = mNormSquare[mLastFound][i] = mDiffLength[i][mLastFound].dot(mDiffLength[i][mLastFound]);
 			}
 		}
@@ -272,23 +272,25 @@ public class Simplex {
 	 * @param pA sum(lambda_i * a_i), where "a_i" is the support point of object A, with lambda_i = deltaX_i / deltaX
 	 * @param pB sum(lambda_i * b_i), where "b_i" is the support point of object B, with lambda_i = deltaX_i / deltaX
 	 */
-	public void computeClosestPointsOfAAndB(Vector3 pA, Vector3 pB) {
+	public Vector3[] computeClosestPointsOfAAndB(Vector3 pA, Vector3 pB) {
 		float deltaX = 0;
-		pA.setAllValues(0, 0, 0);
-		pB.setAllValues(0, 0, 0);
+		pA = Vector3.ZERO;
+		pB = Vector3.ZERO;
 		for (int i = 0, bit = 0x1; i < 4; i++, bit <<= 1) {
 			if (overlap(mBitsCurrentSimplex, bit)) {
 				deltaX += mDet[mBitsCurrentSimplex][i];
-				pA.add(Vector3.multiply(mDet[mBitsCurrentSimplex][i], mSuppPointsA[i]));
-				pB.add(Vector3.multiply(mDet[mBitsCurrentSimplex][i], mSuppPointsB[i]));
+				pA = pA.add(mSuppPointsA[i].mul(mDet[mBitsCurrentSimplex][i]));
+				pB = pB.add(mSuppPointsB[i].mul(mDet[mBitsCurrentSimplex][i]));
 			}
 		}
 		if (deltaX <= 0) {
 			throw new IllegalStateException("deltaX must be greater than zero");
 		}
 		final float factor = 1 / deltaX;
-		pA.multiply(factor);
-		pB.multiply(factor);
+		pA = pA.mul(factor);
+		pB = pB.mul(factor);
+		Vector3[] ret = {pA, pB};
+		return ret;
 	}
 
 	/**
@@ -298,29 +300,28 @@ public class Simplex {
 	 * @param v The vector in which to store the closest point
 	 * @return Whether or not the closest point has been found
 	 */
-	public boolean computeClosestPoint(Vector3 v) {
+	public Vector3 computeClosestPoint() {
 		for (int subset = mBitsCurrentSimplex; subset != 0x0; subset--) {
 			if (isSubset(subset, mBitsCurrentSimplex) && isValidSubset(subset | mLastFoundBit)) {
 				mBitsCurrentSimplex = subset | mLastFoundBit;
-				v.set(computeClosestPointForSubset(mBitsCurrentSimplex));
-				return true;
+				return computeClosestPointForSubset(mBitsCurrentSimplex);
 			}
 		}
 		if (isValidSubset(mLastFoundBit)) {
 			mBitsCurrentSimplex = mLastFoundBit;
 			mMaxLengthSquare = mPointsLengthSquare[mLastFound];
-			v.set(mPoints[mLastFound]);
-			return true;
+			return mPoints[mLastFound];
 		}
-		return false;
+		return null;
 	}
 
 	/**
-	 * Backups the closest point to the passed vector.
+	 * Returns the closest point or the passed Vector.
 	 *
 	 * @param v The vector in which to store the closest point
+	 * @return closest point 
 	 */
-	public void backupClosestPointInSimplex(Vector3 v) {
+	public Vector3 backupClosestPointInSimplex(Vector3 v) {
 		float minDistSquare = Float.MAX_VALUE;
 		for (int bit = mAllBits; bit != 0x0; bit--) {
 			if (isSubset(bit, mAllBits) && isProperSubset(bit)) {
@@ -329,16 +330,17 @@ public class Simplex {
 				if (distSquare < minDistSquare) {
 					minDistSquare = distSquare;
 					mBitsCurrentSimplex = bit;
-					v.set(u);
+					v = u;
 				}
 			}
 		}
+		return v;
 	}
 
 	// Returns the closest point "v" in the convex hull of the points in the subset represented
 	// by the bits "subset".
 	private Vector3 computeClosestPointForSubset(int subset) {
-		final Vector3 v = new Vector3(0, 0, 0);
+		Vector3 v = new Vector3(0, 0, 0);
 		mMaxLengthSquare = 0;
 		float deltaX = 0;
 		for (int i = 0, bit = 0x1; i < 4; i++, bit <<= 1) {
@@ -347,13 +349,13 @@ public class Simplex {
 				if (mMaxLengthSquare < mPointsLengthSquare[i]) {
 					mMaxLengthSquare = mPointsLengthSquare[i];
 				}
-				v.add(Vector3.multiply(mDet[subset][i], mPoints[i]));
+				v = v.add(mPoints[i].mul(mDet[subset][i]));
 			}
 		}
 		if (deltaX <= 0) {
 			throw new IllegalStateException("deltaX must be greater than zero");
 		}
-		return Vector3.multiply(1 / deltaX, v);
+		return v.mul(1 / deltaX);
 	}
 
 	// Returns true if some bits of "a" overlap with bits of "b".

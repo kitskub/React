@@ -30,6 +30,7 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.spout.math.vector.Vector3;
 
 import org.spout.physics.body.CollisionBody;
 import org.spout.physics.body.MobileRigidBody;
@@ -43,7 +44,6 @@ import org.spout.physics.collision.shape.CylinderShape;
 import org.spout.physics.collision.shape.SphereShape;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
-import org.spout.physics.math.Vector3;
 
 public class GJKAndEPAAlgorithmTest {
 	private static final Random RANDOM = new Random();
@@ -80,12 +80,12 @@ public class GJKAndEPAAlgorithmTest {
 	}
 
 	private static void collideShapes(CollisionShape s1, Transform t1, CollisionShape s2, Transform t2) {
-		final Vector3 in = new Vector3();
+		Vector3 in = Vector3.ZERO;
 		switch (s1.getType()) {
 			case BOX: {
 				final BoxShape box = (BoxShape) s1;
 				final Vector3 extend = box.getExtent();
-				in.setAllValues(
+				in = new Vector3(
 						RANDOM.nextInt((int) extend.getX() * 2 + 1) - extend.getX(),
 						RANDOM.nextInt((int) extend.getY() * 2 + 1) - extend.getY(),
 						RANDOM.nextInt((int) extend.getZ() * 2 + 1) - extend.getZ());
@@ -98,13 +98,13 @@ public class GJKAndEPAAlgorithmTest {
 				final float r = RANDOM.nextFloat() * (height - y - height / 2) * (cone.getRadius() / height);
 				final float x = r * (float) Math.cos(RANDOM.nextDouble() * 2 * Math.PI);
 				final float z = r * (float) Math.sin(RANDOM.nextDouble() * 2 * Math.PI);
-				in.setAllValues(x, y, z);
+				in = new Vector3(x, y, z);
 				break;
 			}
 			case CYLINDER: {
 				final CylinderShape cylinder = (CylinderShape) s1;
 				final float r = RANDOM.nextFloat() * cylinder.getRadius();
-				in.setAllValues(
+				in = new Vector3(
 						r * (float) Math.cos(RANDOM.nextDouble() * 2 * Math.PI),
 						RANDOM.nextInt((int) cylinder.getHeight() + 1) - cylinder.getHeight() / 2,
 						r * (float) Math.sin(RANDOM.nextDouble() * 2 * Math.PI));
@@ -115,7 +115,7 @@ public class GJKAndEPAAlgorithmTest {
 				final double phi = RANDOM.nextDouble() * 2 * Math.PI;
 				final double theta = RANDOM.nextDouble() * 2 * Math.PI;
 				final float r = RANDOM.nextFloat() * sphere.getRadius();
-				in.setAllValues(
+				in = new Vector3(
 						r * (float) Math.sin(theta) * (float) Math.cos(phi),
 						r * (float) Math.sin(theta) * (float) Math.sin(phi),
 						r * (float) Math.cos(theta));
@@ -124,26 +124,26 @@ public class GJKAndEPAAlgorithmTest {
 			default:
 				throw new IllegalStateException("Unknown collision shape for s1");
 		}
-		final Vector3 surface = new Vector3();
+		Vector3 surface = Vector3.ZERO;
 		switch (s2.getType()) {
 			case BOX: {
 				final BoxShape box = (BoxShape) s2;
 				final Vector3 extend = box.getExtent();
 				switch (RANDOM.nextInt(3)) {
 					case 0: {
-						surface.setAllValues(
+						surface = new Vector3(
 								RANDOM.nextBoolean() ? extend.getX() : -extend.getX(),
 								RANDOM.nextInt((int) extend.getY() * 2 + 1) - extend.getY(),
 								RANDOM.nextInt((int) extend.getZ() * 2 + 1) - extend.getZ());
 					}
 					case 1: {
-						surface.setAllValues(
+						surface = new Vector3(
 								RANDOM.nextInt((int) extend.getX() * 2 + 1) - extend.getX(),
 								RANDOM.nextBoolean() ? extend.getY() : -extend.getY(),
 								RANDOM.nextInt((int) extend.getZ() * 2 + 1) - extend.getZ());
 					}
 					case 2: {
-						surface.setAllValues(
+						surface = new Vector3(
 								RANDOM.nextInt((int) extend.getX() * 2 + 1) - extend.getX(),
 								RANDOM.nextInt((int) extend.getY() * 2 + 1) - extend.getY(),
 								RANDOM.nextBoolean() ? extend.getZ() : -extend.getZ());
@@ -163,7 +163,7 @@ public class GJKAndEPAAlgorithmTest {
 				}
 				final float x = r * (float) Math.cos(RANDOM.nextDouble() * 2 * Math.PI);
 				final float z = r * (float) Math.sin(RANDOM.nextDouble() * 2 * Math.PI);
-				surface.setAllValues(x, y, z);
+				surface = new Vector3(x, y, z);
 				break;
 			}
 			case CYLINDER: {
@@ -172,7 +172,7 @@ public class GJKAndEPAAlgorithmTest {
 				final float r = Math.abs(y) == cylinder.getHeight() / 2 ? RANDOM.nextFloat() : cylinder.getRadius();
 				final float x = r * (float) Math.cos(RANDOM.nextDouble() * 2 * Math.PI);
 				final float z = r * (float) Math.sin(RANDOM.nextDouble() * 2 * Math.PI);
-				surface.setAllValues(x, y, z);
+				surface = new Vector3(x, y, z);
 				break;
 			}
 			case SPHERE: {
@@ -180,7 +180,7 @@ public class GJKAndEPAAlgorithmTest {
 				final double phi = RANDOM.nextDouble() * 2 * Math.PI;
 				final double theta = RANDOM.nextDouble() * 2 * Math.PI;
 				final float r = sphere.getRadius();
-				surface.setAllValues(
+				surface = new Vector3(
 						r * (float) Math.sin(theta) * (float) Math.cos(phi),
 						r * (float) Math.sin(theta) * (float) Math.sin(phi),
 						r * (float) Math.cos(theta));
@@ -189,9 +189,10 @@ public class GJKAndEPAAlgorithmTest {
 			default:
 				throw new IllegalStateException("Unknown collision shape for s2");
 		}
-		in.set(Transform.multiply(t1, in));
-		surface.set(Matrix3x3.multiply(t2.getOrientation().getMatrix(), surface));
-		t2.setPosition(Vector3.subtract(in, surface.multiply(0.95f)));
+		in = Transform.multiply(t1, in);
+		surface = Matrix3x3.multiply(t2.getOrientation().getMatrix(), surface);
+		surface = surface.mul(0.95f);
+		t2.setPosition(in.sub(surface));
 	}
 
 	private static void nonCollideShapes(CollisionShape s1, Transform t1, CollisionShape s2, Transform t2) {
@@ -260,7 +261,7 @@ public class GJKAndEPAAlgorithmTest {
 				r * (float) Math.sin(theta) * (float) Math.cos(phi),
 				r * (float) Math.sin(theta) * (float) Math.sin(phi),
 				r * (float) Math.cos(theta));
-		t2.setPosition(Vector3.add(t1.getPosition(), dist));
+		t2.setPosition(t1.getPosition().add(dist));
 	}
 
 	private static BroadPhasePair pair(CollisionShape s1, Transform t1, CollisionShape s2, Transform t2) {

@@ -26,17 +26,17 @@
  */
 package org.spout.physics.collision;
 
-import org.spout.physics.math.Vector3;
+import org.spout.math.vector.Vector3;
 
 /**
  * This class contains information about a collision contact computed during the narrow-phase collision detection. This information is used to compute the contact set for a contact between two bodies.
  * The information fields are immutable.
  */
 public class ContactInfo {
-	private final Vector3 normal = new Vector3();
+	private Vector3 normal = Vector3.ZERO;
 	private float penetrationDepth;
-	private final Vector3 localPoint1 = new Vector3();
-	private final Vector3 localPoint2 = new Vector3();
+	private Vector3 localPoint1 = Vector3.ZERO;
+	private Vector3 localPoint2 = Vector3.ZERO;
 
 	/**
 	 * Gets the normal vector for the collision contact in world space.
@@ -53,7 +53,7 @@ public class ContactInfo {
 	 * @param normal The normal vector to set
 	 */
 	public void setNormal(Vector3 normal) {
-		this.normal.set(normal);
+		this.normal = normal;
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class ContactInfo {
 	 * @param firstLocalPoint The contact point to set for the first body
 	 */
 	public void setFirstLocalPoint(Vector3 firstLocalPoint) {
-		localPoint1.set(firstLocalPoint);
+		localPoint1 = firstLocalPoint;
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class ContactInfo {
 	 * @param secondLocalPoint The contact point to set for second body body
 	 */
 	public void setSecondLocalPoint(Vector3 secondLocalPoint) {
-		localPoint2.set(secondLocalPoint);
+		localPoint2 = secondLocalPoint;
 	}
 
 	/**

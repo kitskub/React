@@ -26,15 +26,15 @@
  */
 package org.spout.physics.collision.shape;
 
-import org.spout.physics.math.Vector3;
+import org.spout.math.vector.Vector3;
 
 /**
  * Represents a bounding volume of type "Axis Aligned Bounding Box". It's a box where all the edges are always aligned with the world coordinate system. The AABB is defined by the minimum and maximum
  * world coordinates of the three axis.
  */
 public class AABB {
-	private final Vector3 mMinCoordinates = new Vector3();
-	private final Vector3 mMaxCoordinates = new Vector3();
+	private Vector3 mMinCoordinates = Vector3.ZERO;
+	private Vector3 mMaxCoordinates = Vector3.ZERO;
 
 	/**
 	 * Default constructor. Min and max are the both zero vector3s.
@@ -49,8 +49,8 @@ public class AABB {
 	 * @param maxCoordinates The maximum vector3
 	 */
 	public AABB(Vector3 minCoordinates, Vector3 maxCoordinates) {
-		mMinCoordinates.set(minCoordinates);
-		mMaxCoordinates.set(maxCoordinates);
+		mMinCoordinates = minCoordinates;
+		mMaxCoordinates = maxCoordinates;
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class AABB {
 	 * @return The center vector3
 	 */
 	public Vector3 getCenter() {
-		return Vector3.multiply(Vector3.add(mMinCoordinates, mMaxCoordinates), 0.5f);
+		return mMinCoordinates.add(mMaxCoordinates).mul(0.5f);
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class AABB {
 	 * @param min the minimum vector3 to set
 	 */
 	public void setMin(Vector3 min) {
-		mMinCoordinates.set(min);
+		mMinCoordinates = min;
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class AABB {
 	 * @param max the maximum vector3 to set
 	 */
 	public void setMax(Vector3 max) {
-		mMaxCoordinates.set(max);
+		mMaxCoordinates = max;
 	}
 
 	/**

@@ -26,10 +26,11 @@
  */
 package org.spout.physics.body;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.collision.shape.CollisionShape;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
-import org.spout.physics.math.Vector3;
 
 /**
  * Represents a rigid body for the physics engine. A rigid body is a non-deformable body that has a constant mass. This class inherits from the CollisionBody class.

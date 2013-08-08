@@ -27,6 +27,9 @@
 package org.spout.physics.math;
 
 import java.util.Arrays;
+import org.spout.math.matrix.Matrix3;
+import org.spout.math.vector.Vector3;
+import org.spout.math.vector.VectorN;
 
 import org.spout.physics.ReactDefaults;
 
@@ -58,10 +61,10 @@ public class Matrix3x3 {
 	 * The third column of the matrix. Value of 2
 	 */
 	public static final int THIRD_COLUMN = 2;
-	private final Vector3[] mRows = {
-			new Vector3(),
-			new Vector3(),
-			new Vector3()
+	private final VectorN[] mRows = {
+			new VectorN(),
+			new VectorN(),
+			new VectorN()
 	};
 
 	/**
@@ -127,9 +130,9 @@ public class Matrix3x3 {
 	public final void setAllValues(float a1, float a2, float a3,
 								   float b1, float b2, float b3,
 								   float c1, float c2, float c3) {
-		mRows[0].setAllValues(a1, a2, a3);
-		mRows[1].setAllValues(b1, b2, b3);
-		mRows[2].setAllValues(c1, c2, c3);
+		mRows[0] = new VectorN(a1, a2, a3);
+		mRows[1] = new VectorN(b1, b2, b3);
+		mRows[2] = new VectorN(c1, c2, c3);
 	}
 
 	/**
@@ -153,7 +156,7 @@ public class Matrix3x3 {
 	 * @return The vector3 for the row
 	 */
 	public Vector3 get(int row) {
-		return mRows[row];
+		return new Vector3(mRows[row]);
 	}
 
 	/**
@@ -184,7 +187,7 @@ public class Matrix3x3 {
 	 * @return The vector3 for the row
 	 */
 	public Vector3 getRow(int row) {
-		return mRows[row];
+		return new Vector3(mRows[row]);
 	}
 
 	/**
@@ -202,18 +205,18 @@ public class Matrix3x3 {
 	 * Sets all the values at zero.
 	 */
 	public void setToZero() {
-		mRows[0].setToZero();
-		mRows[1].setToZero();
-		mRows[2].setToZero();
+		mRows[0] = VectorN.ZERO_3;
+		mRows[1] = VectorN.ZERO_3;
+		mRows[2] = VectorN.ZERO_3;
 	}
 
 	/**
 	 * Sets all the matrix values to identity.
 	 */
 	public void setToIdentity() {
-		mRows[0].setAllValues(1, 0, 0);
-		mRows[1].setAllValues(0, 1, 0);
-		mRows[2].setAllValues(0, 0, 1);
+		mRows[0] = new VectorN(1, 0, 0);
+		mRows[1] = new VectorN(0, 1, 0);
+		mRows[2] = new VectorN(0, 0, 1);
 	}
 
 	/**

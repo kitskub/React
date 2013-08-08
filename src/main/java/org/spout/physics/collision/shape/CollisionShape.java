@@ -26,10 +26,11 @@
  */
 package org.spout.physics.collision.shape;
 
+import org.spout.math.vector.Vector3;
+
 import org.spout.physics.ReactDefaults;
 import org.spout.physics.math.Matrix3x3;
 import org.spout.physics.math.Transform;
-import org.spout.physics.math.Vector3;
 
 /**
  * Represents the collision shape associated with a body that is used during the narrow-phase collision detection.
@@ -107,8 +108,8 @@ public abstract class CollisionShape {
 				worldAxis.getColumn(Matrix3x3.FIRST_COLUMN).dot(extents),
 				worldAxis.getColumn(Matrix3x3.SECOND_COLUMN).dot(extents),
 				worldAxis.getColumn(Matrix3x3.THIRD_COLUMN).dot(extents));
-		final Vector3 minCoordinates = Vector3.subtract(transform.getPosition(), worldExtents);
-		final Vector3 maxCoordinates = Vector3.add(transform.getPosition(), worldExtents);
+		final Vector3 minCoordinates = transform.getPosition().sub(worldExtents);
+		final Vector3 maxCoordinates = transform.getPosition().add(worldExtents);
 		aabb.setMin(minCoordinates);
 		aabb.setMax(maxCoordinates);
 	}

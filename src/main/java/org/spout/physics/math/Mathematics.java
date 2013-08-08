@@ -26,6 +26,7 @@
  */
 package org.spout.physics.math;
 
+import org.spout.math.vector.Vector3;
 import org.spout.physics.ReactDefaults;
 
 /**
@@ -54,5 +55,47 @@ public class Mathematics {
 	public static boolean approxEquals(float a, float b, float epsilon) {
 		float difference = a - b;
 		return difference < epsilon && difference > -epsilon;
+	}
+
+	/**
+	 * X_AXIS, represents the x axis in the vector. Value of 0
+	 */
+	public static final int X_AXIS = 0;
+	/**
+	 * Y_AXIS, represents the y axis in the vector. Value of 1
+	 */
+	public static final int Y_AXIS = 1;
+	/**
+	 * Z_AXIS, represents the z axis in the vector. Value of 2
+	 */
+	public static final int Z_AXIS = 2;
+
+	/**
+	 * Return the axis with the minimal value
+	 *
+	 * @return {@link int} axis with minimal value
+	 */
+	public static int getMinAxis(Vector3 v) {
+		return v.getX() < v.getY() ? (v.getX() < v.getZ() ? X_AXIS : Z_AXIS) : (v.getY() < v.getZ() ? Y_AXIS : Z_AXIS);
+	}
+
+	/**
+	 * Return an orthogonal vector of this vector
+	 *
+	 * @return an orthogonal {@link Vector3} of the current vector
+	 */
+	public static Vector3 getOneUnitOrthogonalVector(Vector3 v) {
+		if (v.length() <= ReactDefaults.MACHINE_EPSILON) {
+			throw new IllegalArgumentException("Cannot normalize the zero vector");
+		}
+		final Vector3 vectorAbs = v.abs();
+		final int minElement = getMinAxis(v);
+		if (minElement == 0) {
+			return new Vector3(0, v.getZ() * -1, v.getY()).div((float) Math.sqrt(v.getY() * v.getY() + v.getZ() * v.getZ()));
+		} else if (minElement == 1) {
+			return new Vector3(v.getZ() * -1, 0, v.getX()).div((float) Math.sqrt(v.getX() * v.getX() + v.getZ() * v.getZ()));
+		} else {
+			return new Vector3(v.getY() * -1, v.getX(), 0).div((float) Math.sqrt(v.getX() * v.getX() + v.getY() * v.getY()));
+		}
 	}
 }

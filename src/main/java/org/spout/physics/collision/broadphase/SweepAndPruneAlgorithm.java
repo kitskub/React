@@ -31,10 +31,12 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.array.TIntArrayStack;
 
+import org.spout.math.vector.Vector3;
+import org.spout.math.vector.VectorN;
+
 import org.spout.physics.body.CollisionBody;
 import org.spout.physics.collision.CollisionDetection;
 import org.spout.physics.collision.shape.AABB;
-import org.spout.physics.math.Vector3;
 
 /**
  * This class implements the Sweep-And-Prune (SAP) broad-phase collision detection algorithm. This class implements an array-based version of the algorithm from Pierre Terdiman that is described here:
@@ -76,7 +78,7 @@ public class SweepAndPruneAlgorithm extends BroadPhaseAlgorithm {
 		if (aabb == null) {
 			throw new IllegalArgumentException("Attempting to add a null AABB");
 		}
-		final Vector3 extend = Vector3.subtract(aabb.getMax(), aabb.getMin());
+		final Vector3 extend = aabb.getMax().sub(aabb.getMin());
 		if (extend.getX() < 0 || extend.getY() < 0 || extend.getZ() < 0) {
 			throw new IllegalStateException("AABB for body: " + body + " is invalid! AABB is " + aabb);
 		}
@@ -451,8 +453,8 @@ public class SweepAndPruneAlgorithm extends BroadPhaseAlgorithm {
 
 		private AABBInt(AABB aabb) {
 			for (int axis = 0; axis < 3; axis++) {
-				min[axis] = encodeFloatIntoInteger(aabb.getMin().get(axis));
-				max[axis] = encodeFloatIntoInteger(aabb.getMax().get(axis));
+				min[axis] = encodeFloatIntoInteger(new VectorN(aabb.getMin()).get(axis));
+				max[axis] = encodeFloatIntoInteger(new VectorN(aabb.getMax()).get(axis));
 			}
 		}
 	}
